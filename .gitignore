@@ -149,3 +149,4 @@ viewer/public/bundles/
 
 # Swift Package Manager build artifacts
 extract/.build/
+.playwright-mcp/
