@@ -150,3 +150,8 @@ viewer/public/bundles/
 # Swift Package Manager build artifacts
 extract/.build/
 .playwright-mcp/
+
+# Playwright test artifacts
+viewer/test-results/
+viewer/playwright-report/
+viewer/blob-report/
