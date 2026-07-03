@@ -1,3 +1,6 @@
+import ParallaxViewer from "./components/ParallaxViewer";
+
 export default function App() {
-  return <div style={{ padding: 16, fontFamily: "system-ui" }}>depth viewer — renderer coming next</div>;
+  const name = new URLSearchParams(window.location.search).get("bundle");
+  return <ParallaxViewer bundleUrl={name ? `/bundles/${name}` : null} />;
 }
