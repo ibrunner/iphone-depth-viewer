@@ -745,7 +745,7 @@ Before moving to Phase 3, ALL of the following must be true:
 **Interfaces:**
 - Produces: running dev server (`npm run dev`), test runner (`npx vitest run`), deps `three`, `@types/three`, `@vitejs/plugin-basic-ssl` installed. Later tasks add files under `viewer/src/lib/`.
 
-- [ ] **Step 1: Scaffold**
+- [x] **Step 1: Scaffold**
 
 Run from repo root:
 ```bash
@@ -755,7 +755,7 @@ cd viewer && npm install && npm install three && npm install -D @types/three vit
 ```
 (If `npm create` balks at the non-empty dir, scaffold to `viewer-tmp` and move the contents.)
 
-- [ ] **Step 2: Strip boilerplate**
+- [x] **Step 2: Strip boilerplate**
 
 Replace `viewer/src/App.tsx`:
 ```tsx
@@ -765,19 +765,19 @@ export default function App() {
 ```
 Delete `viewer/src/App.css`, `viewer/src/assets/react.svg`, `viewer/public/vite.svg`; remove their imports/references from `src/main.tsx`, `src/index.css` (keep a minimal `index.css`: `html,body,#root{margin:0;height:100%}`), and `index.html`. Set `<title>depth viewer</title>`.
 
-- [ ] **Step 3: Add test script and verify everything runs**
+- [x] **Step 3: Add test script and verify everything runs**
 
 In `viewer/package.json` scripts add: `"test": "vitest run"`.
 Run: `cd viewer && npm run build && npm run dev -- --port 5173 &` then `curl -s http://localhost:5173 | grep -o "<title>depth viewer</title>"` and kill the dev server.
 Expected: build succeeds; curl prints the title tag.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add -A && git commit -m "feat: viewer scaffold — Vite + React + TS + three"
 ```
 
-- [ ] Task 3.A complete
+- [x] Task 3.A complete
 
 ---
 
@@ -795,7 +795,7 @@ git add -A && git commit -m "feat: viewer scaffold — Vite + React + TS + three
   - `parallax.ts`: `createParallaxScene(canvas: HTMLCanvasElement, bundle: LoadedBundle): { setOffset(x: number, y: number): void; dispose(): void }` — offsets in [-1, 1].
   - `inputs.ts`: `attachMouseInput(el: HTMLElement, onOffset: (x: number, y: number) => void): () => void` (returns detach).
 
-- [ ] **Step 1: Write the failing manifest test**
+- [x] **Step 1: Write the failing manifest test**
 
 `viewer/src/lib/bundle.test.ts`:
 ```ts
@@ -828,12 +828,12 @@ describe("parseManifest", () => {
 });
 ```
 
-- [ ] **Step 2: Run to verify failure**
+- [x] **Step 2: Run to verify failure**
 
 Run: `cd viewer && npx vitest run`
 Expected: FAIL — `./bundle` has no `parseManifest`.
 
-- [ ] **Step 3: Write bundle.ts**
+- [x] **Step 3: Write bundle.ts**
 
 ```ts
 import * as THREE from "three";
@@ -922,12 +922,12 @@ export function syntheticBundle(): LoadedBundle {
 }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `cd viewer && npx vitest run`
 Expected: 4 tests PASS.
 
-- [ ] **Step 5: Write parallax.ts (the Depthy-style shader)**
+- [x] **Step 5: Write parallax.ts (the Depthy-style shader)**
 
 ```ts
 import * as THREE from "three";
@@ -1011,7 +1011,7 @@ export function createParallaxScene(canvas: HTMLCanvasElement, bundle: LoadedBun
 }
 ```
 
-- [ ] **Step 6: Write inputs.ts (mouse only for now — gyro is Task 4.A)**
+- [x] **Step 6: Write inputs.ts (mouse only for now — gyro is Task 4.A)**
 
 ```ts
 export type OffsetCallback = (x: number, y: number) => void;
@@ -1029,7 +1029,7 @@ export function attachMouseInput(el: HTMLElement, onOffset: OffsetCallback): () 
 }
 ```
 
-- [ ] **Step 7: Write ParallaxViewer.tsx and wire App.tsx**
+- [x] **Step 7: Write ParallaxViewer.tsx and wire App.tsx**
 
 `viewer/src/components/ParallaxViewer.tsx`:
 ```tsx
@@ -1082,7 +1082,7 @@ export default function App() {
 }
 ```
 
-- [ ] **Step 8: Verify in the browser (checkpoint)**
+- [x] **Step 8: Verify in the browser (checkpoint)**
 
 Run: `cd viewer && npm run dev`
 Open `http://localhost:5173` — synthetic demo wiggles with the mouse.
@@ -1090,7 +1090,7 @@ Then extract a real bundle into the viewer:
 `cd extract && swift run depth-extract ../samples -o ../viewer/public/bundles`
 Open `http://localhost:5173/?bundle=<bundle-dir-name>` — the real photo parallaxes with mouse movement. Screenshot/eyeball; janky edges are acceptable.
 
-- [ ] **Step 9: Run all viewer tests and commit**
+- [x] **Step 9: Run all viewer tests and commit**
 
 Run: `cd viewer && npx vitest run && npm run build`
 Expected: tests pass, build clean.
@@ -1099,18 +1099,18 @@ Expected: tests pass, build clean.
 git add -A && git commit -m "feat: parallax viewer — bundle loader, displaced-quad shader, mouse input"
 ```
 
-- [ ] Task 3.B complete
+- [x] Task 3.B complete
 
 ### Phase 3 Exit Criteria
 
 Before moving to Phase 4, ALL of the following must be true:
 
-- [ ] `cd viewer && npx vitest run` — 4 `parseManifest` tests pass
-- [ ] `npm run build` clean
-- [ ] Synthetic demo at `http://localhost:5173` parallaxes with mouse movement
-- [ ] A real extracted bundle at `?bundle=<name>` parallaxes with mouse movement (UF-1 visible)
-- [ ] Invalid/missing bundle URL falls back to synthetic demo with an error message in the status line
-- [ ] All task and step checkboxes in Phase 3 are marked `[x]` in this plan file
+- [x] `cd viewer && npx vitest run` — 4 `parseManifest` tests pass
+- [x] `npm run build` clean
+- [x] Synthetic demo at `http://localhost:5173` parallaxes with mouse movement
+- [x] A real extracted bundle at `?bundle=<name>` parallaxes with mouse movement (UF-1 visible)
+- [x] Invalid/missing bundle URL falls back to synthetic demo with an error message in the status line
+- [x] All task and step checkboxes in Phase 3 are marked `[x]` in this plan file
 
 ---
 
