@@ -1283,11 +1283,11 @@ Before moving to Phase 5, ALL of the following must be true:
 - Consumes: the dev server from Task 4.B (HTTPS via basic-ssl), the synthetic fallback bundle from Task 3.B (so the test needs no real photo assets).
 - Produces: `npm run test:e2e` — spec `"mouse parallax shifts rendered pixels"` (name must match the spec's User Flows table).
 
-- [ ] **Step 1: Install Playwright**
+- [x] **Step 1: Install Playwright**
 
 Run: `cd viewer && npm install -D @playwright/test && npx playwright install chromium`
 
-- [ ] **Step 2: Write playwright.config.ts**
+- [x] **Step 2: Write playwright.config.ts**
 
 ```ts
 import { defineConfig } from "@playwright/test";
@@ -1304,7 +1304,7 @@ export default defineConfig({
 });
 ```
 
-- [ ] **Step 3: Write the failing test**
+- [x] **Step 3: Write the failing test**
 
 `viewer/e2e/parallax.spec.ts`:
 ```ts
@@ -1330,25 +1330,25 @@ test("mouse parallax shifts rendered pixels", async ({ page }) => {
 
 Add to `viewer/package.json` scripts: `"test:e2e": "playwright test"`.
 
-- [ ] **Step 4: Run the e2e test**
+- [x] **Step 4: Run the e2e test**
 
 Run: `cd viewer && npm run test:e2e`
 Expected: 1 test PASSES (it fails only if the renderer or input wiring regressed — if it fails, debug the app, not the test).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add -A && git commit -m "test: Playwright e2e for mouse parallax (UF-1)"
 ```
 
-- [ ] Task 5.A complete
+- [x] Task 5.A complete
 
 ### Phase 5 Exit Criteria (plan complete)
 
-- [ ] UF-1: `npm run test:e2e` passes — `"mouse parallax shifts rendered pixels"`
-- [ ] UF-2: manual on-device gyro wiggle confirmed by the user (from Phase 4) and noted in Notes below
-- [ ] `swift test` (extract) and `vitest run` (viewer) both green
-- [ ] All task and step checkboxes in all phases are marked `[x]` in this plan file
+- [x] UF-1: `npm run test:e2e` passes — `"mouse parallax shifts rendered pixels"`
+- [x] UF-2: manual on-device gyro wiggle confirmed by the user (from Phase 4) and noted in Notes below
+- [x] `swift test` (extract) and `vitest run` (viewer) both green
+- [x] All task and step checkboxes in all phases are marked `[x]` in this plan file
 
 ---
 
@@ -1366,3 +1366,4 @@ git add -A && git commit -m "test: Playwright e2e for mouse parallax (UF-1)"
 
 - **D-001** 2026-07-03 [Phase 1–5]: Plan refined into phases with exit criteria; tasks renumbered from flat 1–9 to Phase.Letter (1.A–5.A). Original task content unchanged.
 - **D-002** 2026-07-03 [Task 2.B]: Review found Swift Codable omits nil `source.deviceModel` (key absent) rather than emitting `null`. Contract decision: optional manifest fields (`matte`, `source.deviceModel`) are omitted when absent. Task 3.B's TS type must use `deviceModel?: string | null`.
+- **D-003** 2026-07-03 [Task 5.A]: Port 5173 was occupied by an unrelated process and port 5180 by a phone-demo dev server (which had auto-incremented to listen on 5181); changed `playwright.config.ts` baseURL/webServer to port 5181 instead of the brief's 5173 (`reuseExistingServer: true` kept). Added `test: { exclude: ["e2e/**", "node_modules/**"] }` to `vite.config.ts` so `vitest run` does not pick up `e2e/parallax.spec.ts` (vitest's default glob matches `*.spec.ts` anywhere). Added `viewer/test-results/`, `viewer/playwright-report/`, `viewer/blob-report/` to root `.gitignore`. `npm run test:e2e` passes (1/1), `vitest run` passes (4/4), `npm run build` clean, `swift test` green (4/4). UF-2 was already confirmed on-device in Phase 4 (see line ~1264, "Tilting the phone visibly parallaxes a real extracted portrait").
