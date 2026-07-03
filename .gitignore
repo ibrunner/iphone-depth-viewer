@@ -141,3 +141,8 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# local photo samples and extracted bundles
+samples/*.heic
+samples/*.HEIC
+viewer/public/bundles/
