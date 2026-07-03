@@ -27,6 +27,7 @@ enum TestSupport {
     static func samplePortraitHEIC() -> URL? {
         // Tests run from extract/; samples/ is a sibling of extract/.
         let samples = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()  // strip filename
             .deletingLastPathComponent()  // DepthExtractKitTests
             .deletingLastPathComponent()  // Tests
             .deletingLastPathComponent()  // extract
