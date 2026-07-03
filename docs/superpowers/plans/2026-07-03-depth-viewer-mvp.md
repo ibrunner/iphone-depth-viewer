@@ -1129,7 +1129,7 @@ Before moving to Phase 4, ALL of the following must be true:
 - Consumes: `ParallaxScene.setOffset`, `attachMouseInput`.
 - Produces: `gyroAvailable(): boolean`, `attachGyroInput(onOffset: OffsetCallback): Promise<() => void>` — requests iOS permission (must be called from a user gesture), captures the first orientation reading as the neutral baseline, maps ±15° of tilt to offset [-1, 1]. Rejects with `Error` if permission denied/unsupported.
 
-- [ ] **Step 1: Extend inputs.ts**
+- [x] **Step 1: Extend inputs.ts**
 
 Append:
 ```ts
@@ -1161,7 +1161,7 @@ export async function attachGyroInput(onOffset: OffsetCallback): Promise<() => v
 }
 ```
 
-- [ ] **Step 2: Add the enable-gyro button to ParallaxViewer.tsx**
+- [x] **Step 2: Add the enable-gyro button to ParallaxViewer.tsx**
 
 Add state and handler inside the component (below the existing `useEffect`):
 ```tsx
@@ -1189,18 +1189,18 @@ And in the JSX, next to the status line:
 ```
 Import `attachGyroInput, gyroAvailable` from `../lib/inputs` and `useRef` state as needed. Keep mouse input attached even when gyro is on (last writer wins — fine for a PoC).
 
-- [ ] **Step 3: Verify on desktop (no regression)**
+- [x] **Step 3: Verify on desktop (no regression)**
 
 Run: `cd viewer && npx vitest run && npm run build && npm run dev`
 Expected: tests/build pass; desktop still mouse-wiggles; no gyro button on desktop Chrome (or it errors gracefully).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add -A && git commit -m "feat: gyro parallax input with iOS permission flow"
 ```
 
-- [ ] Task 4.A complete
+- [x] Task 4.A complete
 
 ---
 
@@ -1213,7 +1213,7 @@ git add -A && git commit -m "feat: gyro parallax input with iOS permission flow"
 - Consumes: everything prior.
 - Produces: `npm run dev` serves HTTPS on the LAN (iOS requires a secure context for `DeviceOrientationEvent.requestPermission`); README documents the full photo→wiggle walkthrough.
 
-- [ ] **Step 1: Enable HTTPS + LAN host in vite.config.ts**
+- [x] **Step 1: Enable HTTPS + LAN host in vite.config.ts**
 
 ```ts
 import { defineConfig } from "vite";
@@ -1226,7 +1226,7 @@ export default defineConfig({
 });
 ```
 
-- [ ] **Step 2: Write the walkthrough in README.md**
+- [x] **Step 2: Write the walkthrough in README.md**
 
 Append:
 ```markdown
@@ -1243,27 +1243,27 @@ Notes: the neutral pose is captured the moment you tap the button — hold the p
 intend to view it, then tap. Reload to re-baseline.
 ```
 
-- [ ] **Step 3: End-to-end verification on the phone (checkpoint — user in the loop)**
+- [x] **Step 3: End-to-end verification on the phone (checkpoint — user in the loop)**
 
 Run the walkthrough top to bottom with a real photo. Success criteria: gyro tilt visibly parallaxes the real portrait on the iPhone. Desktop mouse check: `https://localhost:5173/?bundle=<name>` still works (accept cert locally).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add -A && git commit -m "feat: HTTPS LAN serving + iPhone walkthrough — M2 complete"
 ```
 
-- [ ] Task 4.B complete
+- [x] Task 4.B complete
 
 ### Phase 4 Exit Criteria
 
 Before moving to Phase 5, ALL of the following must be true:
 
-- [ ] Desktop regression: mouse parallax still works over `https://localhost:5173` (cert accepted)
-- [ ] On a real iPhone over LAN HTTPS: page loads, "Enable gyro parallax" tap prompts for and receives motion permission
-- [ ] Tilting the phone visibly parallaxes a real extracted portrait (UF-2 — manual, user-confirmed)
-- [ ] README walkthrough followed verbatim reproduces the above from a fresh photo
-- [ ] All task and step checkboxes in Phase 4 are marked `[x]` in this plan file
+- [x] Desktop regression: mouse parallax still works over `https://localhost:5173` (cert accepted)
+- [x] On a real iPhone over LAN HTTPS: page loads, "Enable gyro parallax" tap prompts for and receives motion permission
+- [x] Tilting the phone visibly parallaxes a real extracted portrait (UF-2 — manual, user-confirmed)
+- [x] README walkthrough followed verbatim reproduces the above from a fresh photo
+- [x] All task and step checkboxes in Phase 4 are marked `[x]` in this plan file
 
 ---
 
