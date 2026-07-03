@@ -73,6 +73,8 @@ export function createParallaxScene(canvas: HTMLCanvasElement, bundle: LoadedBun
       window.removeEventListener("resize", resize);
       quad.geometry.dispose();
       (quad.material as THREE.Material).dispose();
+      bundle.color.dispose();
+      bundle.depth.dispose();
       renderer.dispose();
     },
   };
