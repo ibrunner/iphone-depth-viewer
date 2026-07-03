@@ -27,6 +27,18 @@
 - Real Portrait HEIC samples cannot be generated in CI — extractor tests that need one use `XCTSkip` when `samples/` lacks files. The depthless negative case is generated programmatically.
 - Commit after every green test cycle; messages in `type: summary` form.
 
+## Phases
+
+| Phase | Name | Summary |
+|---|---|---|
+| 1 | Foundation | Repo scaffold + compiling Swift package with green tests |
+| 2 | Extractor | Error paths, depth bundle extraction, batch CLI |
+| 3 | Viewer | Vite scaffold, displaced-quad parallax renderer, mouse input (UF-1) |
+| 4 | Phone experience | Gyro input, HTTPS LAN serving, on-device walkthrough (UF-2) |
+| 5 | E2E tests | Playwright coverage of UF-1; manual UF-2 checklist |
+
+User flows are defined in the spec (`docs/superpowers/specs/2026-07-03-depth-viewer-toolkit-design.md`, "User Flows").
+
 ## File Structure
 
 ```
@@ -52,12 +64,20 @@ viewer/                            # Vite + React + TS
   src/components/ParallaxViewer.tsx
   src/App.tsx
   src/lib/bundle.test.ts
+  playwright.config.ts             # Phase 5
+  e2e/parallax.spec.ts             # Phase 5
 docs/superpowers/plans/…           # this plan
 ```
 
 ---
 
-### Task 1: M0 repo scaffold
+## Phase 1: Foundation
+
+**Objective:** Repo layout, documentation, and a compiling Swift package with green tests exist.
+
+**Can run in parallel:** Sequential — Task 1.B assumes the directories Task 1.A creates.
+
+### Task 1.A: M0 repo scaffold
 
 **Files:**
 - Create: `CLAUDE.md`, `samples/README.md`, `extract/.gitkeep`, `pipeline/.gitkeep`, `viewer/.gitkeep`
@@ -133,9 +153,11 @@ Run: `mkdir -p extract pipeline viewer && touch extract/.gitkeep pipeline/.gitke
 git add -A && git commit -m "chore: M0 scaffold — layout, CLAUDE.md, samples guide"
 ```
 
+- [ ] Task 1.A complete
+
 ---
 
-### Task 2: Swift package scaffold
+### Task 1.B: Swift package scaffold
 
 **Files:**
 - Create: `extract/Package.swift`, `extract/Sources/DepthExtractKit/ExtractError.swift`, `extract/Sources/depth-extract/main.swift` (stub), `extract/Tests/DepthExtractKitTests/ExtractorErrorTests.swift` (placeholder test)
@@ -221,16 +243,33 @@ Expected: build succeeds; 1 test passes.
 git add -A && git commit -m "feat: Swift package scaffold for depth-extract"
 ```
 
+- [ ] Task 1.B complete
+
+### Phase 1 Exit Criteria
+
+Before moving to Phase 2, ALL of the following must be true:
+
+- [ ] `cd extract && swift build && swift test` passes (error-description test green)
+- [ ] `extract/`, `pipeline/`, `viewer/`, `samples/` directories exist with CLAUDE.md and samples/README.md committed
+- [ ] `.gitignore` covers `samples/*.heic` and `viewer/public/bundles/`
+- [ ] All task and step checkboxes in Phase 1 are marked `[x]` in this plan file
+
 ---
 
-### Task 3: Extractor error paths (TDD, no sample photos needed)
+## Phase 2: Extractor
+
+**Objective:** `depth-extract` CLI turns a Portrait HEIC into a valid v1 depth bundle, with clear errors for depthless/unreadable files and batch mode over a directory.
+
+**Can run in parallel:** Sequential — 2.A (errors) → 2.B (success path) → 2.C (CLI).
+
+### Task 2.A: Extractor error paths (TDD, no sample photos needed)
 
 **Files:**
 - Create: `extract/Tests/DepthExtractKitTests/TestSupport.swift`, `extract/Sources/DepthExtractKit/Extractor.swift`
 - Test: `extract/Tests/DepthExtractKitTests/ExtractorErrorTests.swift`
 
 **Interfaces:**
-- Produces: `public func extractBundle(from input: URL, to outputDir: URL) throws -> BundleManifest` — for this task it only needs to reach the error throws; the success path is Task 4. To keep this task compiling before Task 4 defines the real manifest, declare a minimal placeholder here that Task 4 replaces: `public struct BundleManifest {}` at the bottom of `Extractor.swift`.
+- Produces: `public func extractBundle(from input: URL, to outputDir: URL) throws -> BundleManifest` — for this task it only needs to reach the error throws; the success path is Task 2.B. To keep this task compiling before Task 2.B defines the real manifest, declare a minimal placeholder here that Task 2.B replaces: `public struct BundleManifest {}` at the bottom of `Extractor.swift`.
 - Produces (tests): `TestSupport.makeDepthlessHEIC() throws -> URL`, `TestSupport.samplePortraitHEIC() -> URL?`.
 
 - [ ] **Step 1: Write TestSupport.swift**
@@ -344,9 +383,11 @@ Expected: all 3 tests PASS.
 git add -A && git commit -m "feat: extractor error paths — unreadable file, no depth data"
 ```
 
+- [ ] Task 2.A complete
+
 ---
 
-### Task 4: Depth bundle extraction (manifest, PNG writers, depth/color/matte)
+### Task 2.B: Depth bundle extraction (manifest, PNG writers, depth/color/matte)
 
 **Files:**
 - Create: `extract/Sources/DepthExtractKit/BundleManifest.swift`, `extract/Sources/DepthExtractKit/ImageWriting.swift`
@@ -354,8 +395,8 @@ git add -A && git commit -m "feat: extractor error paths — unreadable file, no
 - Test: `extract/Tests/DepthExtractKitTests/ExtractorBundleTests.swift`
 
 **Interfaces:**
-- Consumes: `extractBundle(from:to:)` signature and `ExtractError` from Task 3.
-- Produces: `BundleManifest: Codable` matching the Global Constraints JSON exactly (`formatVersion`, `color: ImageRef`, `depth: DepthRef`, `matte: ImageRef?`, `source: SourceInfo`); `extractBundle` writes `<outputDir>/<basename>/{manifest.json,color.png,depth.png[,matte.png]}` and returns the manifest. Task 5's CLI and Task 7's TS types rely on this exact schema.
+- Consumes: `extractBundle(from:to:)` signature and `ExtractError` from Task 2.A.
+- Produces: `BundleManifest: Codable` matching the Global Constraints JSON exactly (`formatVersion`, `color: ImageRef`, `depth: DepthRef`, `matte: ImageRef?`, `source: SourceInfo`); `extractBundle` writes `<outputDir>/<basename>/{manifest.json,color.png,depth.png[,matte.png]}` and returns the manifest. Task 2.C's CLI and Task 3.B's TS types rely on this exact schema.
 
 - [ ] **Step 1: Write the failing test (skips without a real sample)**
 
@@ -589,9 +630,11 @@ If `samples/` is empty, ask the user to AirDrop/export a Portrait HEIC into `sam
 git add -A && git commit -m "feat: depth bundle extraction — depth, color, matte, manifest"
 ```
 
+- [ ] Task 2.B complete
+
 ---
 
-### Task 5: CLI with batch mode
+### Task 2.C: CLI with batch mode
 
 **Files:**
 - Modify: `extract/Sources/depth-extract/main.swift` (replace stub)
@@ -672,9 +715,27 @@ Expected: `ok: … -> depth WxH…` per sample; each bundle dir contains `manife
 git add -A && git commit -m "feat: depth-extract CLI with batch mode"
 ```
 
+- [ ] Task 2.C complete
+
+### Phase 2 Exit Criteria
+
+Before moving to Phase 3, ALL of the following must be true:
+
+- [ ] `cd extract && swift test` — all tests pass with a real sample present (`testExtractsBundleFromPortraitHEIC` PASSES, does not skip)
+- [ ] `swift run depth-extract ../samples -o /tmp/bundles-test` produces a bundle dir with `manifest.json`, `color.png`, `depth.png` (+ `matte.png` for a person photo)
+- [ ] `depth.png` eyeballed: plausible depth silhouette of the photo (near = bright)
+- [ ] Depthless/unreadable inputs print a clear `skip:` message and the CLI exits 1 when nothing succeeds
+- [ ] All task and step checkboxes in Phase 2 are marked `[x]` in this plan file
+
 ---
 
-### Task 6: Viewer scaffold (Vite + React + TS + three + vitest)
+## Phase 3: Viewer
+
+**Objective:** The web viewer renders a depth bundle (or synthetic fallback) with mouse-driven parallax — UF-1 becomes visible.
+
+**Can run in parallel:** Sequential — 3.A (scaffold) → 3.B (renderer).
+
+### Task 3.A: Viewer scaffold (Vite + React + TS + three + vitest)
 
 **Files:**
 - Create (scaffolded): `viewer/` Vite react-ts app
@@ -716,9 +777,11 @@ Expected: build succeeds; curl prints the title tag.
 git add -A && git commit -m "feat: viewer scaffold — Vite + React + TS + three"
 ```
 
+- [ ] Task 3.A complete
+
 ---
 
-### Task 7: Bundle loader + displaced-quad parallax renderer + mouse input
+### Task 3.B: Bundle loader + displaced-quad parallax renderer + mouse input
 
 **Files:**
 - Create: `viewer/src/lib/bundle.ts`, `viewer/src/lib/parallax.ts`, `viewer/src/lib/inputs.ts`, `viewer/src/components/ParallaxViewer.tsx`
@@ -948,7 +1011,7 @@ export function createParallaxScene(canvas: HTMLCanvasElement, bundle: LoadedBun
 }
 ```
 
-- [ ] **Step 6: Write inputs.ts (mouse only for now — gyro is Task 8)**
+- [ ] **Step 6: Write inputs.ts (mouse only for now — gyro is Task 4.A)**
 
 ```ts
 export type OffsetCallback = (x: number, y: number) => void;
@@ -1036,9 +1099,28 @@ Expected: tests pass, build clean.
 git add -A && git commit -m "feat: parallax viewer — bundle loader, displaced-quad shader, mouse input"
 ```
 
+- [ ] Task 3.B complete
+
+### Phase 3 Exit Criteria
+
+Before moving to Phase 4, ALL of the following must be true:
+
+- [ ] `cd viewer && npx vitest run` — 4 `parseManifest` tests pass
+- [ ] `npm run build` clean
+- [ ] Synthetic demo at `http://localhost:5173` parallaxes with mouse movement
+- [ ] A real extracted bundle at `?bundle=<name>` parallaxes with mouse movement (UF-1 visible)
+- [ ] Invalid/missing bundle URL falls back to synthetic demo with an error message in the status line
+- [ ] All task and step checkboxes in Phase 3 are marked `[x]` in this plan file
+
 ---
 
-### Task 8: Gyro input with iOS permission flow
+## Phase 4: Phone experience
+
+**Objective:** The viewer runs over LAN HTTPS on iPhone Safari with gyro-driven parallax — UF-2, the project's payoff moment.
+
+**Can run in parallel:** Sequential — 4.A (gyro) → 4.B (HTTPS + walkthrough).
+
+### Task 4.A: Gyro input with iOS permission flow
 
 **Files:**
 - Modify: `viewer/src/lib/inputs.ts`, `viewer/src/components/ParallaxViewer.tsx`
@@ -1118,9 +1200,11 @@ Expected: tests/build pass; desktop still mouse-wiggles; no gyro button on deskt
 git add -A && git commit -m "feat: gyro parallax input with iOS permission flow"
 ```
 
+- [ ] Task 4.A complete
+
 ---
 
-### Task 9: HTTPS LAN serving + iPhone end-to-end walkthrough
+### Task 4.B: HTTPS LAN serving + iPhone end-to-end walkthrough
 
 **Files:**
 - Modify: `viewer/vite.config.ts`, `README.md`
@@ -1169,6 +1253,103 @@ Run the walkthrough top to bottom with a real photo. Success criteria: gyro tilt
 git add -A && git commit -m "feat: HTTPS LAN serving + iPhone walkthrough — M2 complete"
 ```
 
+- [ ] Task 4.B complete
+
+### Phase 4 Exit Criteria
+
+Before moving to Phase 5, ALL of the following must be true:
+
+- [ ] Desktop regression: mouse parallax still works over `https://localhost:5173` (cert accepted)
+- [ ] On a real iPhone over LAN HTTPS: page loads, "Enable gyro parallax" tap prompts for and receives motion permission
+- [ ] Tilting the phone visibly parallaxes a real extracted portrait (UF-2 — manual, user-confirmed)
+- [ ] README walkthrough followed verbatim reproduces the above from a fresh photo
+- [ ] All task and step checkboxes in Phase 4 are marked `[x]` in this plan file
+
+---
+
+## Phase 5: E2E tests
+
+**Objective:** UF-1 is covered by an automated Playwright test; UF-2 has a recorded manual verification.
+
+**Can run in parallel:** Single task.
+
+### Task 5.A: Playwright E2E for mouse parallax (UF-1)
+
+**Files:**
+- Create: `viewer/playwright.config.ts`, `viewer/e2e/parallax.spec.ts`
+- Modify: `viewer/package.json` (devDependency `@playwright/test`, script `test:e2e`)
+
+**Interfaces:**
+- Consumes: the dev server from Task 4.B (HTTPS via basic-ssl), the synthetic fallback bundle from Task 3.B (so the test needs no real photo assets).
+- Produces: `npm run test:e2e` — spec `"mouse parallax shifts rendered pixels"` (name must match the spec's User Flows table).
+
+- [ ] **Step 1: Install Playwright**
+
+Run: `cd viewer && npm install -D @playwright/test && npx playwright install chromium`
+
+- [ ] **Step 2: Write playwright.config.ts**
+
+```ts
+import { defineConfig } from "@playwright/test";
+
+export default defineConfig({
+  testDir: "e2e",
+  use: { baseURL: "https://localhost:5173", ignoreHTTPSErrors: true },
+  webServer: {
+    command: "npm run dev -- --port 5173",
+    url: "https://localhost:5173",
+    ignoreHTTPSErrors: true,
+    reuseExistingServer: true,
+  },
+});
+```
+
+- [ ] **Step 3: Write the failing test**
+
+`viewer/e2e/parallax.spec.ts`:
+```ts
+import { test, expect } from "@playwright/test";
+
+test("mouse parallax shifts rendered pixels", async ({ page }) => {
+  await page.goto("/"); // no ?bundle= — synthetic demo, zero assets needed
+  const canvas = page.locator("canvas");
+  await expect(canvas).toBeVisible();
+  const box = (await canvas.boundingBox())!;
+
+  await page.mouse.move(box.x + 10, box.y + 10);
+  await page.waitForTimeout(600); // let the eased offset settle
+  const before = await canvas.screenshot();
+
+  await page.mouse.move(box.x + box.width - 10, box.y + box.height - 10);
+  await page.waitForTimeout(600);
+  const after = await canvas.screenshot();
+
+  expect(before.equals(after)).toBe(false);
+});
+```
+
+Add to `viewer/package.json` scripts: `"test:e2e": "playwright test"`.
+
+- [ ] **Step 4: Run the e2e test**
+
+Run: `cd viewer && npm run test:e2e`
+Expected: 1 test PASSES (it fails only if the renderer or input wiring regressed — if it fails, debug the app, not the test).
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add -A && git commit -m "test: Playwright e2e for mouse parallax (UF-1)"
+```
+
+- [ ] Task 5.A complete
+
+### Phase 5 Exit Criteria (plan complete)
+
+- [ ] UF-1: `npm run test:e2e` passes — `"mouse parallax shifts rendered pixels"`
+- [ ] UF-2: manual on-device gyro wiggle confirmed by the user (from Phase 4) and noted in Notes below
+- [ ] `swift test` (extract) and `vitest run` (viewer) both green
+- [ ] All task and step checkboxes in all phases are marked `[x]` in this plan file
+
 ---
 
 ## Out of scope (future plans)
@@ -1176,3 +1357,11 @@ git add -A && git commit -m "feat: HTTPS LAN serving + iPhone walkthrough — M2
 - M3: ComfyUI pipeline (depth refine/upscale, layer split, occlusion inpaint) + layered renderer.
 - M4: lighting (normal maps, IC-Light bakes).
 - Backlog: spatial-photo stereo extraction; custom capture app; video.
+
+---
+
+## Notes
+
+> Add entries here during implementation. Include decisions made, deviations from the plan, and anything a future agent needs to know to continue correctly.
+
+- **D-001** 2026-07-03 [Phase 1–5]: Plan refined into phases with exit criteria; tasks renumbered from flat 1–9 to Phase.Letter (1.A–5.A). Original task content unchanged.

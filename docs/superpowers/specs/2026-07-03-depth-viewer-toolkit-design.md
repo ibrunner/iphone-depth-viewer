@@ -86,6 +86,13 @@ Renderer evolves in place:
 - **Viewer:** manual testing against the checked-in demo bundle; optional Playwright screenshot checks later.
 - **Pipeline:** eyeball validation of workflow outputs; light smoke tests on helper scripts.
 
+## User Flows (E2E-tested)
+
+| ID | Flow | Phase visible | Spec test |
+|----|------|--------------|-----------|
+| UF-1 | Open the viewer, move the mouse over the image — it parallaxes | Phase 3 | `"mouse parallax shifts rendered pixels"` |
+| UF-2 | On iPhone Safari: open viewer over LAN HTTPS, enable gyro, tilt the phone — the photo parallaxes | Phase 4 | manual on-device (gyro is not automatable) |
+
 ## Backlog (explicitly deferred)
 
 - **Spatial photo stereo extraction** — iPhone 15 Pro+ / Vision Pro spatial photos hold a full-resolution stereo pair (no depth map). A second extractor would pull the pair and compute depth via stereo matching. Chief value: high-resolution depth for scenes Portrait mode handles poorly (e.g., landscapes). The bundle format is designed so this slots in as another v1 producer.
