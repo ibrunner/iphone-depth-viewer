@@ -1365,3 +1365,4 @@ git add -A && git commit -m "test: Playwright e2e for mouse parallax (UF-1)"
 > Add entries here during implementation. Include decisions made, deviations from the plan, and anything a future agent needs to know to continue correctly.
 
 - **D-001** 2026-07-03 [Phase 1–5]: Plan refined into phases with exit criteria; tasks renumbered from flat 1–9 to Phase.Letter (1.A–5.A). Original task content unchanged.
+- **D-002** 2026-07-03 [Task 2.B]: Review found Swift Codable omits nil `source.deviceModel` (key absent) rather than emitting `null`. Contract decision: optional manifest fields (`matte`, `source.deviceModel`) are omitted when absent. Task 3.B's TS type must use `deviceModel?: string | null`.
