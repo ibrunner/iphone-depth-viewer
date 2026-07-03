@@ -86,7 +86,7 @@ docs/superpowers/plans/…           # this plan
 **Interfaces:**
 - Produces: directory layout and project documentation all later tasks assume.
 
-- [ ] **Step 1: Write CLAUDE.md**
+- [x] **Step 1: Write CLAUDE.md**
 
 ```markdown
 # iphone-depth-viewer
@@ -117,7 +117,7 @@ and viewer/src/lib/bundle.ts — keep them in sync.
 - TDD where tests are cheap (pure logic); manual verification for GPU/browser behavior.
 ```
 
-- [ ] **Step 2: Write samples/README.md**
+- [x] **Step 2: Write samples/README.md**
 
 ```markdown
 # Samples
@@ -132,7 +132,7 @@ Getting a usable file (depth data survives ONLY the "unmodified original" path):
 Tests skip (not fail) when this directory has no HEICs.
 ```
 
-- [ ] **Step 3: Update README.md and .gitignore**
+- [x] **Step 3: Update README.md and .gitignore**
 
 Replace `README.md` body with the project one-liner plus links to CLAUDE.md and the spec. Append to `.gitignore`:
 
@@ -143,17 +143,17 @@ samples/*.HEIC
 viewer/public/bundles/
 ```
 
-- [ ] **Step 4: Create layer directories**
+- [x] **Step 4: Create layer directories**
 
 Run: `mkdir -p extract pipeline viewer && touch extract/.gitkeep pipeline/.gitkeep viewer/.gitkeep`
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add -A && git commit -m "chore: M0 scaffold — layout, CLAUDE.md, samples guide"
 ```
 
-- [ ] Task 1.A complete
+- [x] Task 1.A complete
 
 ---
 
@@ -166,7 +166,7 @@ git add -A && git commit -m "chore: M0 scaffold — layout, CLAUDE.md, samples g
 **Interfaces:**
 - Produces: `DepthExtractKit` library target importable by tests and CLI; `ExtractError` enum with cases `.unreadableFile(URL)`, `.noDepthData(URL)`.
 
-- [ ] **Step 1: Write Package.swift**
+- [x] **Step 1: Write Package.swift**
 
 ```swift
 // swift-tools-version:5.9
@@ -191,7 +191,7 @@ let package = Package(
 )
 ```
 
-- [ ] **Step 2: Write ExtractError.swift**
+- [x] **Step 2: Write ExtractError.swift**
 
 ```swift
 import Foundation
@@ -211,7 +211,7 @@ public enum ExtractError: Error, CustomStringConvertible, Equatable {
 }
 ```
 
-- [ ] **Step 3: Write stub main.swift and placeholder test**
+- [x] **Step 3: Write stub main.swift and placeholder test**
 
 `extract/Sources/depth-extract/main.swift`:
 ```swift
@@ -232,27 +232,27 @@ final class ExtractorErrorTests: XCTestCase {
 }
 ```
 
-- [ ] **Step 4: Verify build and test**
+- [x] **Step 4: Verify build and test**
 
 Run: `cd extract && rm -f .gitkeep && swift build && swift test`
 Expected: build succeeds; 1 test passes.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add -A && git commit -m "feat: Swift package scaffold for depth-extract"
 ```
 
-- [ ] Task 1.B complete
+- [x] Task 1.B complete
 
 ### Phase 1 Exit Criteria
 
 Before moving to Phase 2, ALL of the following must be true:
 
-- [ ] `cd extract && swift build && swift test` passes (error-description test green)
-- [ ] `extract/`, `pipeline/`, `viewer/`, `samples/` directories exist with CLAUDE.md and samples/README.md committed
-- [ ] `.gitignore` covers `samples/*.heic` and `viewer/public/bundles/`
-- [ ] All task and step checkboxes in Phase 1 are marked `[x]` in this plan file
+- [x] `cd extract && swift build && swift test` passes (error-description test green)
+- [x] `extract/`, `pipeline/`, `viewer/`, `samples/` directories exist with CLAUDE.md and samples/README.md committed
+- [x] `.gitignore` covers `samples/*.heic` and `viewer/public/bundles/`
+- [x] All task and step checkboxes in Phase 1 are marked `[x]` in this plan file
 
 ---
 
@@ -272,7 +272,7 @@ Before moving to Phase 2, ALL of the following must be true:
 - Produces: `public func extractBundle(from input: URL, to outputDir: URL) throws -> BundleManifest` — for this task it only needs to reach the error throws; the success path is Task 2.B. To keep this task compiling before Task 2.B defines the real manifest, declare a minimal placeholder here that Task 2.B replaces: `public struct BundleManifest {}` at the bottom of `Extractor.swift`.
 - Produces (tests): `TestSupport.makeDepthlessHEIC() throws -> URL`, `TestSupport.samplePortraitHEIC() -> URL?`.
 
-- [ ] **Step 1: Write TestSupport.swift**
+- [x] **Step 1: Write TestSupport.swift**
 
 ```swift
 import Foundation
@@ -321,7 +321,7 @@ enum TestSupport {
 }
 ```
 
-- [ ] **Step 2: Write the failing tests**
+- [x] **Step 2: Write the failing tests**
 
 Append to `ExtractorErrorTests.swift`:
 
@@ -341,12 +341,12 @@ Append to `ExtractorErrorTests.swift`:
     }
 ```
 
-- [ ] **Step 3: Run tests to verify they fail**
+- [x] **Step 3: Run tests to verify they fail**
 
 Run: `cd extract && swift test`
 Expected: compile error — `extractBundle` not defined.
 
-- [ ] **Step 4: Implement the error-path skeleton in Extractor.swift**
+- [x] **Step 4: Implement the error-path skeleton in Extractor.swift**
 
 ```swift
 import Foundation
@@ -372,18 +372,18 @@ public func extractBundle(from input: URL, to outputDir: URL) throws -> BundleMa
 }
 ```
 
-- [ ] **Step 5: Run tests to verify they pass**
+- [x] **Step 5: Run tests to verify they pass**
 
 Run: `cd extract && swift test`
 Expected: all 3 tests PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add -A && git commit -m "feat: extractor error paths — unreadable file, no depth data"
 ```
 
-- [ ] Task 2.A complete
+- [x] Task 2.A complete
 
 ---
 
@@ -398,7 +398,7 @@ git add -A && git commit -m "feat: extractor error paths — unreadable file, no
 - Consumes: `extractBundle(from:to:)` signature and `ExtractError` from Task 2.A.
 - Produces: `BundleManifest: Codable` matching the Global Constraints JSON exactly (`formatVersion`, `color: ImageRef`, `depth: DepthRef`, `matte: ImageRef?`, `source: SourceInfo`); `extractBundle` writes `<outputDir>/<basename>/{manifest.json,color.png,depth.png[,matte.png]}` and returns the manifest. Task 2.C's CLI and Task 3.B's TS types rely on this exact schema.
 
-- [ ] **Step 1: Write the failing test (skips without a real sample)**
+- [x] **Step 1: Write the failing test (skips without a real sample)**
 
 `ExtractorBundleTests.swift`:
 ```swift
@@ -435,12 +435,12 @@ final class ExtractorBundleTests: XCTestCase {
 }
 ```
 
-- [ ] **Step 2: Run tests — new test should skip (no sample yet) or fail to compile**
+- [x] **Step 2: Run tests — new test should skip (no sample yet) or fail to compile**
 
 Run: `cd extract && swift test`
 Expected: compile error (`manifest.color` etc. don't exist on the placeholder struct).
 
-- [ ] **Step 3: Write BundleManifest.swift (and delete the placeholder in Extractor.swift)**
+- [x] **Step 3: Write BundleManifest.swift (and delete the placeholder in Extractor.swift)**
 
 ```swift
 import Foundation
@@ -470,7 +470,7 @@ public struct BundleManifest: Codable {
 }
 ```
 
-- [ ] **Step 4: Write ImageWriting.swift**
+- [x] **Step 4: Write ImageWriting.swift**
 
 ```swift
 import Foundation
@@ -511,7 +511,7 @@ enum ImageWriting {
 }
 ```
 
-- [ ] **Step 5: Implement the success path in Extractor.swift**
+- [x] **Step 5: Implement the success path in Extractor.swift**
 
 Replace the whole file:
 
@@ -615,22 +615,22 @@ public func extractBundle(from input: URL, to outputDir: URL) throws -> BundleMa
 }
 ```
 
-- [ ] **Step 6: Run tests**
+- [x] **Step 6: Run tests**
 
 Run: `cd extract && swift test`
 Expected: error tests PASS; bundle test SKIPS if `samples/` is empty, PASSES if the user has dropped a sample in.
 
-- [ ] **Step 7: Ask the user for a real sample (checkpoint)**
+- [x] **Step 7: Ask the user for a real sample (checkpoint)**
 
 If `samples/` is empty, ask the user to AirDrop/export a Portrait HEIC into `samples/` per `samples/README.md`, then rerun `swift test` and confirm the bundle test passes (not skips) before continuing. This is the first moment real depth data flows end to end — worth the pause.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add -A && git commit -m "feat: depth bundle extraction — depth, color, matte, manifest"
 ```
 
-- [ ] Task 2.B complete
+- [x] Task 2.B complete
 
 ---
 
@@ -643,7 +643,7 @@ git add -A && git commit -m "feat: depth bundle extraction — depth, color, mat
 - Consumes: `extractBundle(from:to:)`, `ExtractError`.
 - Produces: `depth-extract <inputs...> [-o outputDir]` — inputs are HEIC files or directories (expanded non-recursively); continues past per-file errors; exit 1 if nothing succeeded.
 
-- [ ] **Step 1: Replace main.swift**
+- [x] **Step 1: Replace main.swift**
 
 ```swift
 import Foundation
@@ -699,33 +699,33 @@ struct DepthExtract: ParsableCommand {
 
 Note: because `main.swift` in an executable target conflicts with `@main`, rename the file to `DepthExtract.swift` in the same directory (`git mv extract/Sources/depth-extract/main.swift extract/Sources/depth-extract/DepthExtract.swift`).
 
-- [ ] **Step 2: Build and verify error behavior without a sample**
+- [x] **Step 2: Build and verify error behavior without a sample**
 
 Run: `cd extract && swift run depth-extract /nonexistent.heic -o /tmp/bundles-test; echo "exit: $?"`
 Expected: `skip: Cannot read image file: /nonexistent.heic`, `0/1 extracted…`, `exit: 1`.
 
-- [ ] **Step 3: Verify against a real sample (checkpoint)**
+- [x] **Step 3: Verify against a real sample (checkpoint)**
 
 Run: `cd extract && swift run depth-extract ../samples -o /tmp/bundles-test && ls /tmp/bundles-test/*/`
 Expected: `ok: … -> depth WxH…` per sample; each bundle dir contains `manifest.json color.png depth.png` (+ `matte.png` for people). Open `depth.png` with `open` and eyeball that it looks like a plausible depth silhouette.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add -A && git commit -m "feat: depth-extract CLI with batch mode"
 ```
 
-- [ ] Task 2.C complete
+- [x] Task 2.C complete
 
 ### Phase 2 Exit Criteria
 
 Before moving to Phase 3, ALL of the following must be true:
 
-- [ ] `cd extract && swift test` — all tests pass with a real sample present (`testExtractsBundleFromPortraitHEIC` PASSES, does not skip)
-- [ ] `swift run depth-extract ../samples -o /tmp/bundles-test` produces a bundle dir with `manifest.json`, `color.png`, `depth.png` (+ `matte.png` for a person photo)
-- [ ] `depth.png` eyeballed: plausible depth silhouette of the photo (near = bright)
-- [ ] Depthless/unreadable inputs print a clear `skip:` message and the CLI exits 1 when nothing succeeds
-- [ ] All task and step checkboxes in Phase 2 are marked `[x]` in this plan file
+- [x] `cd extract && swift test` — all tests pass with a real sample present (`testExtractsBundleFromPortraitHEIC` PASSES, does not skip)
+- [x] `swift run depth-extract ../samples -o /tmp/bundles-test` produces a bundle dir with `manifest.json`, `color.png`, `depth.png` (+ `matte.png` for a person photo)
+- [x] `depth.png` eyeballed: plausible depth silhouette of the photo (near = bright)
+- [x] Depthless/unreadable inputs print a clear `skip:` message and the CLI exits 1 when nothing succeeds
+- [x] All task and step checkboxes in Phase 2 are marked `[x]` in this plan file
 
 ---
 
